@@ -79,13 +79,31 @@ Tetris.start = function() {
 	Tetris.stats.domElement.style.top = '0px';
 	document.body.appendChild( Tetris.stats.domElement );
 
-	Tetris.addCameraListeners();
+	Tetris.Block.generate();
+
 	Tetris.animate();
 };
 
+Tetris.gameStepTime = 1000;
+
+Tetris.frameTime = 0; // ms
+Tetris.cumulatedFrameTime = 0; // ms
+Tetris._lastFrameTime = Date.now(); // timestamp
+
 Tetris.animate = function() {
-	Tetris.camera.rotation.x = Tetris.orbitX;
-	Tetris.camera.rotation.y = Tetris.orbitY;
+//	Tetris.camera.rotation.x = Tetris.orbitX;
+//	Tetris.camera.rotation.y = Tetris.orbitY;
+	
+	var time = Date.now();
+	Tetris.frameTime = time - Tetris._lastFrameTime;
+	Tetris._lastFrameTime = time;
+	Tetris.cumulatedFrameTime += Tetris.frameTime;
+
+	while(Tetris.cumulatedFrameTime > Tetris.gameStepTime) {
+		Tetris.cumulatedFrameTime -= Tetris.gameStepTime;
+		
+		Tetris.Block.stepForward();
+	}
 	
 	Tetris.renderer.render(Tetris.scene, Tetris.camera);
 	
@@ -93,6 +111,10 @@ Tetris.animate = function() {
 	
 	window.requestAnimationFrame(Tetris.animate);
 }
+
+
+// nice test:
+//var i = 0, j = 0, k = 0, interval = setInterval(function() {if(i==10) {i=0;j++;} if(j==10) {j=0;k++;} if(k==10) {clearInterval(interval); return;} Tetris.addStaticBlock(i,j,k); i++;},30)
 
 Tetris.staticBlocks = [];
 Tetris.zColors = [
@@ -111,11 +133,32 @@ Tetris.addStaticBlock = function(x,y,z) {
 	mesh.position.y = (y - Tetris.boundingBoxConfig.splitY/2)*Tetris.blockSize + Tetris.blockSize/2;
 	mesh.position.z = (z - Tetris.boundingBoxConfig.splitZ/2)*Tetris.blockSize + Tetris.blockSize/2;
 	mesh.overdraw = true;
-	Tetris.scene.add(mesh);	
 	
+	Tetris.scene.add(mesh);	
 	Tetris.staticBlocks[x][y][z] = mesh;
 };
 
+window.addEventListener('keypress', function (event) {
+	switch(event.keyCode) {
+		case 119:
+			Tetris.Block.move(0, Tetris.blockSize);
+			break;
+		case 115:
+			Tetris.Block.move(0, -1*Tetris.blockSize);
+			break;
+		case 100:
+			Tetris.Block.move(Tetris.blockSize, 0);
+			break;
+		case 97:
+			Tetris.Block.move(-1*Tetris.blockSize, 0);
+			break;				
+	}
+}, false);	
+
+/**
+* for debug, may be removed
+*/
+/*
 Tetris.addCameraListeners = function() {
 	var moving = false. lastx = 0; lastY = 0, self = this;
 	self.orbitX = 0;
@@ -177,6 +220,6 @@ Tetris.addCameraListeners = function() {
 				break;				
 		}
 	}, false);	
+	
 }
-
-//var i = 0, j = 0, k = 0, interval = setInterval(function() {if(i==10) {i=0;j++;} if(j==10) {j=0;k++;} if(k==10) {clearInterval(interval); return;} Tetris.addStaticBlock(i,j,k); i++;},30)
+*/
