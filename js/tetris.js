@@ -55,7 +55,7 @@ Tetris.start = function() {
 		splitZ: 20
 	};
 	Tetris.boundingBoxConfig = boundingBoxConfig;
-	Tetris.blockSize = 60;
+	Tetris.blockSize = boundingBoxConfig.width/boundingBoxConfig.splitX;
 	
 	var boundingBox = new THREE.Mesh(
 		new THREE.CubeGeometry(boundingBoxConfig.width, boundingBoxConfig.height, boundingBoxConfig.depth, boundingBoxConfig.splitX, boundingBoxConfig.splitY, boundingBoxConfig.splitZ, [], true), 
@@ -76,15 +76,17 @@ Tetris.start = function() {
 
 	Tetris.stats = new Stats();
 	Tetris.stats.domElement.style.position = 'absolute';
-	Tetris.stats.domElement.style.top = '0px';
+	Tetris.stats.domElement.style.top = '10px';
+	Tetris.stats.domElement.style.left = '10px';
 	document.body.appendChild( Tetris.stats.domElement );
 
+	Tetris.Board.init(boundingBoxConfig.splitX, boundingBoxConfig.splitY, boundingBoxConfig.splitZ);
+	
 	Tetris.Block.generate();
-
 	Tetris.animate();
 };
 
-Tetris.gameStepTime = 1000;
+Tetris.gameStepTime = 300;
 
 Tetris.frameTime = 0; // ms
 Tetris.cumulatedFrameTime = 0; // ms
