@@ -26,35 +26,38 @@ Tetris.Board.moveBlock = function(block) {
 	for(x = 0; x < fields.length; x++) {
 		for(y = 0; y < fields[0].length; y++) {
 			for(z = 0; z < fields[0][0].length; z++) {
-				if(fields[x][y][z] == -1) fields[x][y][z] = 0;
+				if(fields[x][y][z] == -1) { 
+					fields[x][y][z] = 0;
+				}
 			}				
 		}
 	}
 	
-	var posx = block.position.x, posy = block.position.y, posz = block.position.z;
-	
-	for(y = 0 ; y < block.shape.length; y++) {
-		for(x = 0 ; x < block.shape[0].length; x++) {
-			if(block.shape[y][x] == 0) continue;
-			
-			if((x+posx) < 0 || (y+posy) < 0 || (x+posx) >= fields.length || (y+posy) >= fields[0].length) {
-				return Tetris.Board.COLLISION_WALL;
-			}
-			
-			if(fields[x+posx][y+posy][posz] == 1 || posz < 0) {
-				return Tetris.Board.COLLISION_GROUND;
-			}
-			
-			Tetris.Board.fields[x+posx][y+posy][posz] = -1;
+	var posx = block.position.x, posy = block.position.y, posz = block.position.z, shape = block.shape;
+
+	for(var i = 0 ; i < shape.length; i++) {
+		if((shape[i].x+posx) < 0 || (shape[i].y+posy) < 0 || (shape[i].x+posx) >= fields.length || (shape[i].y+posy) >= fields[0].length) {
+			return Tetris.Board.COLLISION_WALL;
 		}
+		
+		if(fields[shape[i].x+posx][shape[i].y+posy][shape[i].z+posz+1] == 1) {
+			return Tetris.Board.COLLISION_WALL;
+		}
+		
+		if(fields[shape[i].x+posx][shape[i].y+posy][shape[i].z+posz] == 1 || (shape[i].z+posz) < 0) {
+			return Tetris.Board.COLLISION_GROUND;
+		}
+		
+		fields[shape[i].x+posx][shape[i].y+posy][shape[i].z+posz] = -1;
 	}
+
 }
 
 Tetris.Board.checkCompleted = function() {
 	var x,y,z,x2,y2,z2, fields = Tetris.Board.fields;
 	var rebuild = false;
 
-	var sum, expected = fields[0].length*fields.length;
+	var sum, expected = fields[0].length*fields.length, bonus = 0;
 	
 	for(z = 0; z < fields[0][0].length; z++) {
 		sum = 0;
@@ -65,6 +68,9 @@ Tetris.Board.checkCompleted = function() {
 		}
 
 		if(sum == expected) {
+			bonus++;
+			if(bonus == 1) console.log("points!");
+			else console.log("points! bonus x", bonus);
 			
 			for(y2 = 0; y2 < fields[0].length; y2++) {
 				for(x2 = 0; x2 < fields.length; x2++) {

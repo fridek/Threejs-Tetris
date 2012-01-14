@@ -120,7 +120,7 @@ Tetris.animate = function() {
 
 Tetris.staticBlocks = [];
 Tetris.zColors = [
-	0x6666ff, 0x66ffff, 0x3399ff, 0x666633, 0x669966, 0x9966ff, 0x66ff66, 0xff6666, 0x99ff00, 0x003399, 0x330099
+	0x6666ff, 0x66ffff, 0x7B68EE, 0x666633, 0x669966, 0x9966ff, 0x66ff66, 0x00EE76, 0x99ff00, 0x003399, 0x330099, 0xee1289, 0xFFA500, 0x71C671, 0x00BFFF, 0x666633, 0x669966, 0x9966ff
 ];
 Tetris.addStaticBlock = function(x,y,z) {
 	if(Tetris.staticBlocks[x] == undefined) Tetris.staticBlocks[x] = [];
@@ -140,20 +140,50 @@ Tetris.addStaticBlock = function(x,y,z) {
 	Tetris.staticBlocks[x][y][z] = mesh;
 };
 
-window.addEventListener('keypress', function (event) {
-	switch(event.keyCode) {
-		case 119:
-			Tetris.Block.move(0, Tetris.blockSize);
+window.addEventListener('keydown', function (event) {
+	var key = event.which ? event.which : event.keyCode;
+	switch(key) {
+		//case 
+
+		case 38: // up (arrow)
+			Tetris.Block.move(0, Tetris.blockSize, 0);
 			break;
-		case 115:
-			Tetris.Block.move(0, -1*Tetris.blockSize);
+		case 40: // down (arrow)
+			Tetris.Block.move(0, -1*Tetris.blockSize, 0);
 			break;
-		case 100:
-			Tetris.Block.move(Tetris.blockSize, 0);
+		case 37: // left(arrow)
+			Tetris.Block.move(-1*Tetris.blockSize, 0, 0);
 			break;
-		case 97:
-			Tetris.Block.move(-1*Tetris.blockSize, 0);
-			break;				
+		case 39: // right (arrow)
+			Tetris.Block.move(Tetris.blockSize, 0, 0);
+			break;	
+		case 32: // space
+			Tetris.Block.move(0, 0, -1*Tetris.blockSize);
+			break;
+			
+		case 87: // up (w)
+			
+			Tetris.Block.rotate(90, 0, 0);
+			break;
+		case 83: // down (s)
+			
+			Tetris.Block.rotate(-90, 0, 0);
+			break;
+		case 65: // left(a)
+			Tetris.Block.rotate(0, 0, 90);
+			break;
+		case 68: // right (d)
+			Tetris.Block.rotate(0, 0, -90);
+			break;	
+
+		case 81: // (q)
+			Tetris.Block.rotate(0, 90, 0);
+			break;
+		case 69: // (e)	
+			Tetris.Block.rotate(0, -90, 0);
+			break;
+			
+
 	}
 }, false);	
 
