@@ -15,7 +15,15 @@ if ( !window.requestAnimationFrame ) {
 }
 
 var Tetris = {};
-Tetris.start = function() {
+Tetris.sounds = {};
+
+Tetris.init = function() {
+	Tetris.sounds["theme"] = document.getElementById("audio_theme");  
+	Tetris.sounds["collision"] = document.getElementById("audio_collision");  
+	Tetris.sounds["move"] = document.getElementById("audio_move");  
+	Tetris.sounds["gameover"] = document.getElementById("audio_gameover");  
+	
+	Tetris.sounds["theme"].play();
 
 	// set the scene size
 	var WIDTH = window.innerWidth,
@@ -37,7 +45,7 @@ Tetris.start = function() {
 	Tetris.scene = new THREE.Scene();
 
 	// the camera starts at 0,0,0 so pull it back
-	Tetris.camera.position.z = 600;
+	Tetris.camera.position.z = 400;
 	Tetris.scene.add(Tetris.camera);
 
 	// start the renderer
@@ -47,11 +55,11 @@ Tetris.start = function() {
 	document.body.appendChild(Tetris.renderer.domElement);
 
 	var boundingBoxConfig = {
-		width: 600,
-		height: 600,
+		width: 480,
+		height: 480,
 		depth: 1200,
-		splitX: 10,
-		splitY: 10,
+		splitX: 8,
+		splitY: 8,
 		splitZ: 20
 	};
 	Tetris.boundingBoxConfig = boundingBoxConfig;
@@ -81,17 +89,32 @@ Tetris.start = function() {
 	document.body.appendChild( Tetris.stats.domElement );
 
 	Tetris.Board.init(boundingBoxConfig.splitX, boundingBoxConfig.splitY, boundingBoxConfig.splitZ);
+	Tetris.renderer.render(Tetris.scene, Tetris.camera);
 	
-	Tetris.Block.generate();
-	Tetris.animate();
+	document.getElementById("play_button").addEventListener('click', function (event) {
+		event.preventDefault();
+		Tetris.start();
+	});
 };
 
-Tetris.gameStepTime = 300;
+Tetris.gameStepTime = 1000;
 
 Tetris.frameTime = 0; // ms
 Tetris.cumulatedFrameTime = 0; // ms
 Tetris._lastFrameTime = Date.now(); // timestamp
 
+Tetris.pointsDOM;
+Tetris.start = function() {
+	document.getElementById("menu").style.display = "none";
+	Tetris.pointsDOM = document.getElementById("points");
+	Tetris.pointsDOM.style.display = "block";
+	
+	Tetris.sounds["theme"].pause();
+	Tetris.Block.generate();
+	Tetris.animate();
+};
+
+Tetris.gameOver = false;
 Tetris.animate = function() {
 //	Tetris.camera.rotation.x = Tetris.orbitX;
 //	Tetris.camera.rotation.y = Tetris.orbitY;
@@ -103,7 +126,6 @@ Tetris.animate = function() {
 
 	while(Tetris.cumulatedFrameTime > Tetris.gameStepTime) {
 		Tetris.cumulatedFrameTime -= Tetris.gameStepTime;
-		
 		Tetris.Block.stepForward();
 	}
 	
@@ -111,7 +133,7 @@ Tetris.animate = function() {
 	
 	Tetris.stats.update();
 	
-	window.requestAnimationFrame(Tetris.animate);
+	if(!Tetris.gameOver) window.requestAnimationFrame(Tetris.animate);
 }
 
 
@@ -120,7 +142,7 @@ Tetris.animate = function() {
 
 Tetris.staticBlocks = [];
 Tetris.zColors = [
-	0x6666ff, 0x66ffff, 0x7B68EE, 0x666633, 0x669966, 0x9966ff, 0x66ff66, 0x00EE76, 0x99ff00, 0x003399, 0x330099, 0xee1289, 0xFFA500, 0x71C671, 0x00BFFF, 0x666633, 0x669966, 0x9966ff
+	0x6666ff, 0x66ffff, 0xcc68EE, 0x666633, 0x66ff66, 0x9966ff, 0x00ff66, 0x66EE33, 0x003399, 0x330099, 0xFFA500, 0x99ff00, 0xee1289, 0x71C671, 0x00BFFF, 0x666633, 0x669966, 0x9966ff
 ];
 Tetris.addStaticBlock = function(x,y,z) {
 	if(Tetris.staticBlocks[x] == undefined) Tetris.staticBlocks[x] = [];
@@ -139,6 +161,14 @@ Tetris.addStaticBlock = function(x,y,z) {
 	Tetris.scene.add(mesh);	
 	Tetris.staticBlocks[x][y][z] = mesh;
 };
+
+
+Tetris.currentPoints = 0;
+Tetris.addPoints = function(n) {
+	Tetris.currentPoints += n;
+	Tetris.pointsDOM.innerHTML = Tetris.currentPoints;
+	Cufon.replace('#points');
+}
 
 window.addEventListener('keydown', function (event) {
 	var key = event.which ? event.which : event.keyCode;

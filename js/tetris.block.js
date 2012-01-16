@@ -1,9 +1,6 @@
 window.Tetris = window.Tetris  || {};
 Tetris.Block = {};
 
-/**
-* Shapes are fitted in minimal number of arrays, in one Z-axis-aligned slice
-*/
 Tetris.Block.shapes = [
 	[
 		{x: 0, y: 0, z: 0},
@@ -74,19 +71,22 @@ Tetris.Block.generate = function() {
 	]);
 	
 	// initial position
-	Tetris.Block.position = {x: 4, y: 4, z: 15};
+	Tetris.Block.position = {x: Math.floor(Tetris.boundingBoxConfig.splitX/2)-1, y: Math.floor(Tetris.boundingBoxConfig.splitY/2)-1, z: 15};
 	Tetris.Block.rotation = {x: 0, y: 0, z: 0};
 	
-	Tetris.Block.mesh.position.x = (4 - Tetris.boundingBoxConfig.splitX/2)*Tetris.blockSize + Tetris.blockSize/2;
-	Tetris.Block.mesh.position.y = (4 - Tetris.boundingBoxConfig.splitY/2)*Tetris.blockSize + Tetris.blockSize/2;
-	Tetris.Block.mesh.position.z = (15 - Tetris.boundingBoxConfig.splitZ/2)*Tetris.blockSize + Tetris.blockSize/2;
+	Tetris.Block.mesh.position.x = (Tetris.Block.position.x - Tetris.boundingBoxConfig.splitX/2)*Tetris.blockSize/2;
+	Tetris.Block.mesh.position.y = (Tetris.Block.position.y - Tetris.boundingBoxConfig.splitY/2)*Tetris.blockSize/2;
+	Tetris.Block.mesh.position.z = (Tetris.Block.position.z - Tetris.boundingBoxConfig.splitZ/2)*Tetris.blockSize + Tetris.blockSize/2;
 	Tetris.Block.mesh.overdraw = true;
 
 	
 	var collision = Tetris.Board.moveBlock(Tetris.Block);
 	
 	if(collision == Tetris.Board.COLLISION_GROUND) {
-		console.log("game over");
+		Tetris.gameOver = true;
+		Tetris.sounds["gameover"].play();
+		Tetris.pointsDOM.innerHTML = "GAME OVER";
+		Cufon.replace('#points');		
 	}
 	
 	Tetris.scene.add(Tetris.Block.mesh);
@@ -99,6 +99,7 @@ Tetris.Block.stepForward = function() {
 	var collision = Tetris.Board.moveBlock(Tetris.Block);
 
 	if(collision == Tetris.Board.COLLISION_GROUND) {
+		Tetris.sounds["collision"].play();
 		Tetris.Block.position.z += 1;
 		Tetris.Block.hitBottom();
 		
@@ -119,6 +120,8 @@ Tetris.Block.stepForward = function() {
 				}
 			}				
 		}		
+	} else {
+		Tetris.sounds["move"].play();
 	}
 	// return hit the bottom
 }
@@ -154,10 +157,10 @@ Tetris.Block.rotate = function(x,y,z) {
 			case 0:
 			break;
 			case 90:
-				newshape = swap(-1*newshape.z, newshape.y, newshape.x);
+				newshape = swap(newshape.z, newshape.y, -1*newshape.x);
 			break;
 			case -90:
-				newshape = swap(newshape.z, newshape.y, -1*newshape.x);
+				newshape = swap(-1*newshape.z, newshape.y, newshape.x);
 			break;
 		}
 		switch(z) {
@@ -211,7 +214,6 @@ Tetris.Block.move = function(x,y,z) {
 Tetris.Block.petrify = function() {
 	var shape = Tetris.Block.shape;
 	for(var i = 0 ; i < shape.length; i++) {
-		console.log(shape[i].x,Tetris.Block.position.x,shape[i].z,Tetris.Block.position.y,shape[i].z,Tetris.Block.position.z);
 		Tetris.addStaticBlock(Tetris.Block.position.x + shape[i].x, Tetris.Block.position.y + shape[i].y, Tetris.Block.position.z + shape[i].z);
 		Tetris.Board.fields[Tetris.Block.position.x + shape[i].x][Tetris.Block.position.y + shape[i].y][Tetris.Block.position.z + shape[i].z] = 1;
 	}
