@@ -62,14 +62,6 @@
 		}
 	</style>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-	<script type="text/javascript" src="js/Three.js"></script>
-	<script type="text/javascript" src="js/Stats.js"></script>
-	<script type="text/javascript" src="js/tetris.js"></script>
-	<script type="text/javascript" src="js/tetris.block.js"></script>	
-	<script type="text/javascript" src="js/tetris.board.js"></script>	
-	
-	<script src="js/cufon-yui.js" type="text/javascript"></script>
-	<script src="js/Blox_400.font.js" type="text/javascript"></script>
 	</head>
   <body onload="Tetris.init()">
 	<div id="menu">
@@ -81,10 +73,21 @@
 		0
 	</div>
   
-	<audio id="audio_theme" src="tetris.mp3" preload="auto"></audio>
-	<audio id="audio_move" src="move.mp3" preload="auto"></audio>
-	<audio id="audio_collision" src="collision.mp3" preload="auto"></audio>
-	<audio id="audio_gameover" src="gameover.mp3" preload="auto"></audio>
+	<audio id="audio_theme" src="music/tetris.mp3" preload="auto"></audio>
+	<audio id="audio_move" src="music/move.mp3" preload="auto"></audio>
+	<audio id="audio_collision" src="music/collision.mp3" preload="auto"></audio>
+	<audio id="audio_gameover" src="music/gameover.mp3" preload="auto"></audio>
+  <audio id="audio_score" src="music/cash.mp3" preload="auto"></audio>
+	
+	<script type="text/javascript" src="js/Three.js"></script>
+	<script type="text/javascript" src="js/Stats.js"></script>
+	<script type="text/javascript" src="js/tetris.js"></script>
+	<script type="text/javascript" src="js/tetris.block.js"></script>	
+	<script type="text/javascript" src="js/tetris.board.js"></script>	
+	
+	<script src="js/cufon-yui.js" type="text/javascript"></script>
+	<script src="js/Blox_400.font.js" type="text/javascript"></script>	
+	
 	<script type="text/javascript">
 		Cufon.replace('#menu h1');
 		Cufon.replace('#points');

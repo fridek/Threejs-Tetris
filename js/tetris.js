@@ -14,6 +14,25 @@ if ( !window.requestAnimationFrame ) {
 	})();
 }
 
+THREE.Matrix4.prototype.round = function() {
+  this.n11 = Math.round(this.n11);
+  this.n12 = Math.round(this.n12);
+  this.n13 = Math.round(this.n13);
+  this.n14 = Math.round(this.n14);
+  this.n21 = Math.round(this.n21);
+  this.n22 = Math.round(this.n22);
+  this.n23 = Math.round(this.n23);
+  this.n24 = Math.round(this.n24);
+  this.n31 = Math.round(this.n31);
+  this.n32 = Math.round(this.n32);
+  this.n33 = Math.round(this.n33);
+  this.n34 = Math.round(this.n34);
+  this.n41 = Math.round(this.n41);
+  this.n42 = Math.round(this.n42);
+  this.n43 = Math.round(this.n43);
+  this.n44 = Math.round(this.n44);
+};
+
 var Tetris = {};
 Tetris.sounds = {};
 
@@ -22,6 +41,7 @@ Tetris.init = function() {
 	Tetris.sounds["collision"] = document.getElementById("audio_collision");  
 	Tetris.sounds["move"] = document.getElementById("audio_move");  
 	Tetris.sounds["gameover"] = document.getElementById("audio_gameover");  
+  Tetris.sounds["score"] = document.getElementById("audio_score");  
 	
 	Tetris.sounds["theme"].play();
 
@@ -55,11 +75,11 @@ Tetris.init = function() {
 	document.body.appendChild(Tetris.renderer.domElement);
 
 	var boundingBoxConfig = {
-		width: 480,
-		height: 480,
+		width: 360,
+		height: 360,
 		depth: 1200,
-		splitX: 8,
-		splitY: 8,
+		splitX: 6,
+		splitY: 6,
 		splitZ: 20
 	};
 	Tetris.boundingBoxConfig = boundingBoxConfig;
@@ -90,6 +110,8 @@ Tetris.init = function() {
 
 	Tetris.Board.init(boundingBoxConfig.splitX, boundingBoxConfig.splitY, boundingBoxConfig.splitZ);
 	Tetris.renderer.render(Tetris.scene, Tetris.camera);
+	
+	// Tetris.addCameraListeners();
 	
 	document.getElementById("play_button").addEventListener('click', function (event) {
 		event.preventDefault();
@@ -172,6 +194,7 @@ Tetris.addPoints = function(n) {
 
 window.addEventListener('keydown', function (event) {
 	var key = event.which ? event.which : event.keyCode;
+
 	switch(key) {
 		//case 
 
@@ -217,71 +240,3 @@ window.addEventListener('keydown', function (event) {
 	}
 }, false);	
 
-/**
-* for debug, may be removed
-*/
-/*
-Tetris.addCameraListeners = function() {
-	var moving = false. lastx = 0; lastY = 0, self = this;
-	self.orbitX = 0;
-	self.orbitY = 0;
-
-	// Set up the appropriate event hooks
-	this.renderer.domElement.addEventListener('mousedown', function (event) {
-		if (event.which === 1) {
-			moving = true;
-		}
-		lastX = event.pageX;
-		lastY = event.pageY;
-	}, false);
-
-	this.renderer.domElement.addEventListener('mousemove', function (event) {
-		if (moving) {
-			var xDelta = event.pageX  - lastX,
-				yDelta = event.pageY  - lastY;
-
-			lastX = event.pageX;
-			lastY = event.pageY;
-
-			self.orbitY += xDelta * 0.025;
-			while (self.orbitY < 0) {
-				self.orbitY += Math.PI * 2;
-			}
-			while (self.orbitY >= Math.PI * 2) {
-				self.orbitY -= Math.PI * 2;
-			}
-
-			self.orbitX += yDelta * 0.025;
-			while (self.orbitX < 0) {
-				self.orbitX += Math.PI * 2;
-			}
-			while (self.orbitX >= Math.PI * 2) {
-				self.orbitX -= Math.PI * 2;
-			}
-		}
-	}, false);
-
-	this.renderer.domElement.addEventListener('mouseup', function () {
-		moving = false;
-	}, false);
-	
-	window.addEventListener('keypress', function (event) {
-		console.log(event.keyCode);
-		switch(event.keyCode) {
-			case 115:
-				Tetris.camera.position.z+=10;
-				break;
-			case 119:
-				Tetris.camera.position.z-=10;
-				break;
-			case 100:
-				Tetris.camera.position.y+=10;
-				break;
-			case 97:
-				Tetris.camera.position.y-=10;
-				break;				
-		}
-	}, false);	
-	
-}
-*/

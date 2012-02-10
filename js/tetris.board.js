@@ -22,17 +22,6 @@ Tetris.Board.moveBlock = function(block) {
 	var x,y,z;
 	
 	var fields = Tetris.Board.fields;
-	/*
-	for(x = 0; x < fields.length; x++) {
-		for(y = 0; y < fields[0].length; y++) {
-			for(z = 0; z < fields[0][0].length; z++) {
-				if(fields[x][y][z] == -1) { 
-					fields[x][y][z] = 0;
-				}
-			}				
-		}
-	}
-	*/
 	var posx = block.position.x, posy = block.position.y, posz = block.position.z, shape = block.shape;
 
 	for(var i = 0 ; i < shape.length; i++) {
@@ -47,8 +36,6 @@ Tetris.Board.moveBlock = function(block) {
 		if(fields[shape[i].x+posx][shape[i].y+posy][shape[i].z+posz] == 1 || (shape[i].z+posz) < 0) {
 			return Tetris.Board.COLLISION_GROUND;
 		}
-		
-		//fields[shape[i].x+posx][shape[i].y+posy][shape[i].z+posz] = -1;
 	}
 
 }
@@ -82,7 +69,8 @@ Tetris.Board.checkCompleted = function() {
 		}
 	}
 	if(bonus) {
-		Tetris.addPoints(1000 * bonus);	
+		Tetris.addPoints(1000 * bonus);
+    Tetris.sounds["score"].play();
 	}
 	return rebuild;
 }

@@ -1,4 +1,11 @@
 window.Tetris = window.Tetris  || {};
+
+Tetris.Utils = {};
+
+Tetris.Utils.cloneVector = function (v) {
+  return {x: v.x, y: v.y, z: v.z};
+};
+
 Tetris.Block = {};
 
 Tetris.Block.shapes = [
@@ -12,7 +19,6 @@ Tetris.Block.shapes = [
 		{x: 0, y: 0, z: 0},
 		{x: 0, y: 1, z: 0},
 		{x: 0, y: 2, z: 0},
-		{x: 0, y: 3, z: 0}
 	],
 	[
 		{x: 0, y: 0, z: 0},
@@ -31,37 +37,27 @@ Tetris.Block.shapes = [
 		{x: 0, y: 1, z: 0},
 		{x: 1, y: 1, z: 0},
 		{x: 1, y: 2, z: 0}
-	]/*,
-	[
-		[1,1,1,1,1],
-		[1,1,1,1,1],
-		[1,1,1,1,1],
-		[1,1,1,1,1],
-		[1,1,1,1,1]
-	]*/
+	]
 ];
 
 Tetris.Block.position = {};
-Tetris.Block.rotation = {};
 
 Tetris.Block.generate = function() {
 	var geometry, tmpGeometry;
 	
 	var type = Math.floor(Math.random()*(Tetris.Block.shapes.length));
+  this.blockType = type;
 	
-	// var type = 5;
-	
-	var shape = Tetris.Block.shapes[type];
 	Tetris.Block.shape = [];
 	for(var i = 0; i < Tetris.Block.shapes[type].length; i++) {
-		Tetris.Block.shape[i] = {x: Tetris.Block.shapes[type][i].x, y: Tetris.Block.shapes[type][i].y, z: Tetris.Block.shapes[type][i].z};
+		Tetris.Block.shape[i] = Tetris.Utils.cloneVector(Tetris.Block.shapes[type][i]);
 	}
 	
-	geometry = new THREE.CubeGeometry( Tetris.blockSize, Tetris.blockSize, Tetris.blockSize);
-	for(var i = 1 ; i < shape.length; i++) {
-		tmpGeometry = new THREE.Mesh(new THREE.CubeGeometry( Tetris.blockSize, Tetris.blockSize, Tetris.blockSize));
-		tmpGeometry.position.x = Tetris.blockSize * shape[i].x;
-		tmpGeometry.position.y = Tetris.blockSize * shape[i].y;
+	geometry = new THREE.CubeGeometry(Tetris.blockSize, Tetris.blockSize, Tetris.blockSize);
+	for(var i = 1 ; i < Tetris.Block.shape.length; i++) {
+		tmpGeometry = new THREE.Mesh(new THREE.CubeGeometry(Tetris.blockSize, Tetris.blockSize, Tetris.blockSize));
+		tmpGeometry.position.x = Tetris.blockSize * Tetris.Block.shape[i].x;
+		tmpGeometry.position.y = Tetris.blockSize * Tetris.Block.shape[i].y;
 		THREE.GeometryUtils.merge(geometry, tmpGeometry);
 	}
 
@@ -77,6 +73,7 @@ Tetris.Block.generate = function() {
 	Tetris.Block.mesh.position.x = (Tetris.Block.position.x - Tetris.boundingBoxConfig.splitX/2)*Tetris.blockSize/2;
 	Tetris.Block.mesh.position.y = (Tetris.Block.position.y - Tetris.boundingBoxConfig.splitY/2)*Tetris.blockSize/2;
 	Tetris.Block.mesh.position.z = (Tetris.Block.position.z - Tetris.boundingBoxConfig.splitZ/2)*Tetris.blockSize + Tetris.blockSize/2;
+  Tetris.Block.mesh.rotation = {x: 0, y: 0, z: 0};
 	Tetris.Block.mesh.overdraw = true;
 
 	
@@ -90,7 +87,7 @@ Tetris.Block.generate = function() {
 	}
 	
 	Tetris.scene.add(Tetris.Block.mesh);
-}
+};
 
 Tetris.Block.stepForward = function() {
 	Tetris.Block.mesh.position.z -= Tetris.blockSize;
@@ -124,63 +121,30 @@ Tetris.Block.stepForward = function() {
 		Tetris.sounds["move"].play();
 	}
 	// return hit the bottom
-}
+};
+
 
 Tetris.Block.rotate = function(x,y,z) {
 	Tetris.Block.mesh.rotation.x += x * Math.PI / 180;
 	Tetris.Block.mesh.rotation.y += y * Math.PI / 180;
 	Tetris.Block.mesh.rotation.z += z * Math.PI / 180;
 
-	Tetris.Block.rotation.x = (Tetris.Block.rotation.x + x + 360)%360;
-	Tetris.Block.rotation.y = (Tetris.Block.rotation.y + y + 360)%360;
-	Tetris.Block.rotation.z = (Tetris.Block.rotation.z + z + 360)%360;
+	
+  var rotationMatrix = new THREE.Matrix4();
+  rotationMatrix.setRotationFromEuler(Tetris.Block.mesh.rotation);
+  rotationMatrix.round();
 
-	var shape = Tetris.Block.shape, newshape;
-	
-	function swap(x, y, z) {
-		return {x: x, y: y, z: z};
-	}
-	
-	for(var i = 0 ; i < shape.length; i++) {
-		newshape = {x: shape[i].x, y: shape[i].y, z: shape[i].z};
-		switch(x) {
-			case 0:
-			break;
-			case 90:
-				newshape = swap(newshape.x, -1*newshape.z, newshape.y);
-			break;
-			case -90:
-				newshape = swap(newshape.x, newshape.z, -1*newshape.y);
-			break;
-		}
-		switch(y) {
-			case 0:
-			break;
-			case 90:
-				newshape = swap(newshape.z, newshape.y, -1*newshape.x);
-			break;
-			case -90:
-				newshape = swap(-1*newshape.z, newshape.y, newshape.x);
-			break;
-		}
-		switch(z) {
-			case 0:
-			break;
-			case 90:
-				newshape = swap(-1*newshape.y, newshape.x, newshape.z);
-			break;
-			case -90:
-				newshape = swap(newshape.y, -1*newshape.x, newshape.z);
-			break;
-		}
-		Tetris.Block.shape[i] = newshape;
+	for(var i = 0 ; i < Tetris.Block.shape.length; i++) {
+    Tetris.Block.shape[i] = rotationMatrix.multiplyVector3(
+      Tetris.Utils.cloneVector(Tetris.Block.shapes[this.blockType][i])
+    );
 	}
 
 	var collision = Tetris.Board.moveBlock(Tetris.Block);
 	if(collision == Tetris.Board.COLLISION_WALL) {
 		Tetris.Block.rotate(-x,-y,-z); //oh laziness
 	}
-}
+};
 
 Tetris.Block.move = function(x,y,z) {
 	if(x) {
@@ -206,7 +170,7 @@ Tetris.Block.move = function(x,y,z) {
 			Tetris.Block.position.y -= y>0?1:-1;	
 		}
 	}
-}
+};
 
 /**
 * call when hits the floor and should be transformed to static blocks
@@ -217,11 +181,11 @@ Tetris.Block.petrify = function() {
 		Tetris.addStaticBlock(Tetris.Block.position.x + shape[i].x, Tetris.Block.position.y + shape[i].y, Tetris.Block.position.z + shape[i].z);
 		Tetris.Board.fields[Tetris.Block.position.x + shape[i].x][Tetris.Block.position.y + shape[i].y][Tetris.Block.position.z + shape[i].z] = 1;
 	}
-}
+};
 
 Tetris.Block.hitBottom = function() {
 	this.petrify();
 	
 	Tetris.scene.removeObject(Tetris.Block.mesh);
 	Tetris.Block.generate();
-}
+};
