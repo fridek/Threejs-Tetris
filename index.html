@@ -8,10 +8,10 @@
 		#menu {
 			position: absolute;
 			width: 200px;
-			height: 150px;
+			height: 250px;
 			
 			top: 50%; left: 50%;
-			margin: -75px 0 0 -100px;
+			margin: -125px 0 0 -100px;
 			
 			text-align: center;
 			
@@ -22,6 +22,9 @@
 			box-shadow: 2px 10px 5px #888;
 		}
 		
+    #menu p {font-weight: bold; color: #fff;}
+    #menu p a {color: #fff;}
+
 		#menu button {
 			width: 80px;
 			height: 25px;
@@ -66,6 +69,11 @@
   <body onload="Tetris.init()">
 	<div id="menu">
 		<h1>Three.js Tetris</h1>
+    <p>
+      Movement: arrows<br>
+      Rotation: AW/SD/QE<br>
+      Author: <a href="http://www.smashinglabs.pl">smashinglabs.pl</a>
+    </p>
 		<button id="play_button">Play</button>
 	</div>
   
